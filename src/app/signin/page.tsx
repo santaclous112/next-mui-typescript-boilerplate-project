@@ -13,8 +13,10 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme } from '@mui/material';
-import { ThemeProvider } from '@emotion/react';
+// import { createTheme } from '@mui/material';
+// import { ThemeProvider } from '@emotion/react';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { collapseClasses } from '@mui/material';
 
 function Copyright(props: any) {
   return (
@@ -89,7 +91,7 @@ export default function SignIn() {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3, mb: 2, backgroundColor: '#1976d2 !important' }}
             >
               Sign In
             </Button>
