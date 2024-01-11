@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from 'react';
+import { useRouter } from 'next/navigation'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,6 +15,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axios from 'axios';
 
 function Copyright(props: any) {
   return (
@@ -32,13 +34,21 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+  // const [newUser, setNewUser] = useState({});
+  const router = useRouter();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
+    const newUser = {
+      firstName: data.get("firstName"),
+      lastName: data.get("lastName"),
       email: data.get('email'),
-      password: data.get('password'),
-    });
+      password: data.get('password')
+    };
+    // setNewUser(_newUser);
+    console.log(newUser)
+    axios.post("http://localhost:5000/api/users/signup", newUser)
+      .then(res => router.push("/signin"))
   };
 
   return (
@@ -100,6 +110,17 @@ export default function SignUp() {
                   label="Password"
                   type="password"
                   id="password"
+                  autoComplete="new-password"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="confirmPassword"
+                  label="Confirm Password"
+                  type="password"
+                  id="confirmPassword"
                   autoComplete="new-password"
                 />
               </Grid>
