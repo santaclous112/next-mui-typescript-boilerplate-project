@@ -59,11 +59,11 @@ export default function SignIn() {
       email: data.get('email'),
       password: data.get('password'),
     };
-    // console.log(user);
-    axios.post("http://localhost:5000/api/users/signup", user)
+    console.log(user);
+    axios.post("http://localhost:5000/api/users/signin", user)
       .then(res => {
           router.push("/dashboard");
-          console.log(res)
+          localStorage.setItem("user", JSON.stringify(res.data.user))
       })
       .catch(err => console.log(err))
   };
