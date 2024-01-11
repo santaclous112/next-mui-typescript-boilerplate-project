@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { useAppContext } from '../context/AddContext';
 
 function Copyright(props: any) {
   return (
@@ -34,7 +35,7 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-  // const [newUser, setNewUser] = useState({});
+  const appContext = useAppContext();
   const router = useRouter();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -46,9 +47,13 @@ export default function SignUp() {
       password: data.get('password')
     };
     // setNewUser(_newUser);
-    console.log(newUser)
+    // console.log(newUser)
     axios.post("http://localhost:5000/api/users/signup", newUser)
-      .then(res => router.push("/signin"))
+      .then(res => {
+          router.push("/signin");
+          appContext.setSignupSuccess(true);
+      })
+      .catch(err => console.log(err))
   };
 
   return (
@@ -135,7 +140,7 @@ export default function SignUp() {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3, mb: 2, backgroundColor: '#1976d2 !important' }}
             >
               Sign Up
             </Button>

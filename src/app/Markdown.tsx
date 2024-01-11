@@ -18,6 +18,7 @@ const options = {
         component: 'h1',
       },
     },
+
     h2: {
       component: Typography,
       props: { gutterBottom: true, variant: 'h6', component: 'h2' },

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from 'react';
+import { useAppContext } from '../context/AddContext';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,7 +14,12 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import MuiAlert from '@mui/material/Alert'; 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Snackbar from '@mui/material/Snackbar';
+import { AlertProps } from '@mui/material/Alert';
+import axios from 'axios';
+import { useRouter } from 'next/navigation'
 
 function Copyright(props: any) {
   return (
@@ -28,17 +34,38 @@ function Copyright(props: any) {
   );
 }
 
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref,
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function SignIn() {
+  const appContext = useAppContext();
+  const router = useRouter();
+  const handleClose = () => {
+    appContext.setSignupSuccess(false);
+  };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
+    const user = {
       email: data.get('email'),
       password: data.get('password'),
-    });
+    };
+    // console.log(user);
+    axios.post("http://localhost:5000/api/users/signup", user)
+      .then(res => {
+          router.push("/dashboard");
+          console.log(res)
+      })
+      .catch(err => console.log(err))
   };
 
   return (
@@ -92,6 +119,11 @@ export default function SignIn() {
             >
               Sign In
             </Button>
+            <Snackbar open={appContext.signupSuccess} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{vertical: "top", horizontal: "right"}}>
+              <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>:
+                Your Sign Up is Successful!!!
+              </Alert>
+            </Snackbar>
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
