@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from 'react';
+import { useEffect } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
@@ -12,9 +13,7 @@ import Header from './Header';
 import MainFeaturedPost from './MainFeaturedPost';
 import FeaturedPost from './FeaturedPost';
 import Footer from './Footer';
-// import post1 from './blog-post.1.md';
-// import post2 from './blog-post.2.md';
-// import post3 from './blog-post.3.md';
+import { useRouter } from 'next/navigation'
 
 const sections = [
   { title: 'Technology', url: '#' },
@@ -87,6 +86,18 @@ const sidebar = {
 const defaultTheme = createTheme();
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const auth = localStorage.getItem("auth");
+    console.log(auth)
+    if(auth) {
+      router.push('/dashboard');
+    } else {
+      router.push('/');
+    }
+  }, [router])
+  
   return (
     <ThemeProvider theme={defaultTheme}>
       <CssBaseline />
@@ -99,15 +110,6 @@ export default function Home() {
               <FeaturedPost key={post.title} post={post} />
             ))}
           </Grid>
-          {/* <Grid container spacing={5} sx={{ mt: 3 }}>
-            <Main title="From the firehose" posts={posts} />
-            <Sidebar
-              title={sidebar.title}
-              description={sidebar.description}
-              archives={sidebar.archives}
-              social={sidebar.social}
-            />
-          </Grid> */}
         </main>
       </Container>
       <Footer
