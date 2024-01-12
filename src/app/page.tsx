@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from 'react';
+import { useEffect } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
@@ -12,6 +13,7 @@ import Header from './Header';
 import MainFeaturedPost from './MainFeaturedPost';
 import FeaturedPost from './FeaturedPost';
 import Footer from './Footer';
+import { useRouter } from 'next/navigation'
 
 const sections = [
   { title: 'Technology', url: '#' },
@@ -84,6 +86,18 @@ const sidebar = {
 const defaultTheme = createTheme();
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const auth = localStorage.getItem("auth");
+    console.log(auth)
+    if(auth) {
+      router.push('/dashboard');
+    } else {
+      router.push('/');
+    }
+  }, [router])
+  
   return (
     <ThemeProvider theme={defaultTheme}>
       <CssBaseline />

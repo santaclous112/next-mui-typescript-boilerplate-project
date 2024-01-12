@@ -13,17 +13,20 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import LogoutIcon from '@mui/icons-material/Logout';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
 import Chart from './Chart';
 import Orders from './Orders';
+import { useRouter } from 'next/navigation'
+import { useAppContext } from '../context/AddContext';
+import { AlertProps } from '@mui/material/Alert';
+import MuiAlert from '@mui/material/Alert'; 
+import { Snackbar } from '@mui/material';
 
 function Copyright(props: any) {
   return (
@@ -42,10 +45,6 @@ const drawerWidth: number = 240;
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
-}
-
-interface IStorage {
-  getItem(key: string): string | null;
 }
 
 const AppBar = styled(MuiAppBar, {
@@ -92,19 +91,40 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref,
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Dashboard() {
+  const appContext = useAppContext();
+
   const [open, setOpen] = useState<boolean>(true);
   const [userInfo, setUserInfo] = useState<string | null>("");
+  const router = useRouter();
+
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  const handleClose = () => {
+    appContext.setSigninSuccess(false);
   };
 
   useEffect(() => {
     setUserInfo(localStorage.getItem("user"));
   }, [])
+
+  const logout = () => {
+    localStorage.removeItem("auth");
+    localStorage.removeItem("user");
+    router.push('/');
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -137,7 +157,7 @@ export default function Dashboard() {
             >
               Dashboard
             </Typography>
-            <IconButton color="inherit">
+            <IconButton color="inherit" onClick={ logout }>
               <LogoutIcon/>
             </IconButton>
           </Toolbar>
@@ -202,6 +222,11 @@ export default function Dashboard() {
             <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>
+        <Snackbar open={appContext.signinSuccess} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{vertical: "top", horizontal: "right"}}>
+          <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>:
+            Welcome to our Dashboard!!!
+          </Alert>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   );

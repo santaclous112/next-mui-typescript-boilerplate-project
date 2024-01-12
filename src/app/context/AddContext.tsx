@@ -3,10 +3,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 interface IAuthContextProps {
-  user: string;
-  setUser: (_: string) => void;
-  isAdmin: boolean;
-  setIsAdmin: (_: boolean) => void;
   isAuth: boolean;
   setIsAuth: (_: boolean) => void;
   signupSuccess: boolean;
@@ -16,10 +12,6 @@ interface IAuthContextProps {
 }
 
 const defaultValue: IAuthContextProps = {
-  user: "",
-  setUser: (_: string) => {},
-  isAdmin: false,
-  setIsAdmin: (_: boolean) => {},
   isAuth: false,
   setIsAuth: (_: boolean) => {},
   signupSuccess: false,
@@ -35,27 +27,18 @@ interface IAppWrapperProps {
 }
 
 export function AppWrapper({ children }: IAppWrapperProps) {
-  const [currentUser, setCurrentUser] = useState<string>("");
-  const [admin, setAdmin] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [signupSuccess, setSignupSuccess] = useState<boolean>(false);
   const [signinSuccess, setSigninSuccess] = useState<boolean>(false);
 
   useEffect(() => {
-    const user: string | null = localStorage.getItem("user");
-    setCurrentUser(user && JSON.parse(user));
+    const user: string | null = localStorage.getItem("auth");
     if (user) {
       setIsAuthenticated(true);
-      const admin = JSON.parse(user).admin;
-      setAdmin(admin == "0" ? false : true);
     }
   }, []);
 
   const sharedState = {
-    user: currentUser,
-    setUser: setCurrentUser,
-    isAdmin: admin,
-    setIsAdmin: setAdmin,
     isAuth: isAuthenticated,
     setIsAuth: setIsAuthenticated,
     signupSuccess: signupSuccess,

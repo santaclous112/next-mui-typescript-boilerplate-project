@@ -20,7 +20,11 @@ export default function Header(props: HeaderProps) {
   return (
     <React.Fragment>
       <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Button size="small">Subscribe</Button>
+        <Button size="small">
+          <Link href = "/signup" sx={{ textDecoration: "none" }}>
+            Subscribe
+          </Link>
+        </Button>
         <Typography
           component="h2"
           variant="h5"
