@@ -29,7 +29,7 @@ export default function Orders() {
   },[]);
   return (
     <React.Fragment>
-      <Title>Recent Orders</Title>
+      <Title>All Clients</Title>
       <Table size="small">
         <TableHead>
           <TableRow>

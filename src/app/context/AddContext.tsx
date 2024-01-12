@@ -9,6 +9,14 @@ interface IAuthContextProps {
   setSignupSuccess: (_: boolean) => void;
   signinSuccess: boolean;
   setSigninSuccess: (_: boolean) => void;
+  passwordError: boolean;
+  setPasswordError: (_: boolean) => void;
+  fieldError: boolean;
+  setFieldError: (_: boolean) => void;
+  isEmailError: boolean;
+  setIsEmailError: (_: boolean) => void;
+  existEmailError: boolean;
+  setExistEmailError: (_: boolean) => void
 }
 
 const defaultValue: IAuthContextProps = {
@@ -17,7 +25,15 @@ const defaultValue: IAuthContextProps = {
   signupSuccess: false,
   setSignupSuccess: (_: boolean) => {},
   signinSuccess: false,
-  setSigninSuccess: (_: boolean) => {}
+  setSigninSuccess: (_: boolean) => {},
+  passwordError: false,
+  setPasswordError: (_: boolean) => {},
+  fieldError: false,
+  setFieldError: (_: boolean) => {},
+  isEmailError: false,
+  setIsEmailError: (_: boolean) => {},
+  existEmailError: false,
+  setExistEmailError: (_: boolean) => {}
 };
 
 const AuthContext = createContext<IAuthContextProps>(defaultValue);
@@ -30,6 +46,10 @@ export function AppWrapper({ children }: IAppWrapperProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [signupSuccess, setSignupSuccess] = useState<boolean>(false);
   const [signinSuccess, setSigninSuccess] = useState<boolean>(false);
+  const [passwordError, setPasswordError] = useState<boolean>(false);
+  const [fieldError, setFieldError] = useState<boolean>(false);
+  const [isEmailError, setIsEmailError] = useState<boolean>(false);
+  const [existEmailError, setExistEmailError] = useState<boolean>(false);
 
   useEffect(() => {
     const user: string | null = localStorage.getItem("auth");
@@ -44,7 +64,15 @@ export function AppWrapper({ children }: IAppWrapperProps) {
     signupSuccess: signupSuccess,
     setSignupSuccess: setSignupSuccess,
     signinSuccess: signinSuccess,
-    setSigninSuccess: setSigninSuccess
+    setSigninSuccess: setSigninSuccess,
+    passwordError: passwordError,
+    setPasswordError: setPasswordError,
+    fieldError: fieldError,
+    setFieldError: setFieldError,
+    isEmailError: isEmailError,
+    setIsEmailError: setIsEmailError,
+    existEmailError: existEmailError,
+    setExistEmailError: setExistEmailError
   };
 
   return (

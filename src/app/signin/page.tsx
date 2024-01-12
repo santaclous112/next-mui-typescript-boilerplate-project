@@ -1,46 +1,50 @@
-"use client"
+"use client";
 
-import * as React from 'react';
-import { useAppContext } from '../context/AddContext';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import MuiAlert from '@mui/material/Alert'; 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Snackbar from '@mui/material/Snackbar';
-import { AlertProps } from '@mui/material/Alert';
-import axios from 'axios';
-import { useRouter } from 'next/navigation'
+import * as React from "react";
+import { useAppContext } from "../context/AddContext";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import MuiAlert from "@mui/material/Alert";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Snackbar from "@mui/material/Snackbar";
+import { AlertProps } from "@mui/material/Alert";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 function Copyright(props: any) {
   return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
+    <Typography
+      variant="body2"
+      color="text.secondary"
+      align="center"
+      {...props}
+    >
+      {"Copyright © "}
+      <Link color="inherit" href="#">
+        Santa Website
+      </Link>{" "}
       {new Date().getFullYear()}
-      {'.'}
+      {"."}
     </Typography>
   );
 }
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
-  ref,
+  ref
 ) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
@@ -50,24 +54,43 @@ export default function SignIn() {
   const router = useRouter();
   const handleClose = () => {
     appContext.setSignupSuccess(false);
+    appContext.setPasswordError(false);
+    appContext.setFieldError(false);
+    appContext.setIsEmailError(false);
+    appContext.setExistEmailError(false);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const user = {
-      email: data.get('email'),
-      password: data.get('password'),
+      email: data.get("email"),
+      password: data.get("password"),
     };
     // console.log(user);
-    axios.post("http://localhost:5000/api/users/signin", user)
-      .then(res => {
-          router.push("/dashboard");
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          localStorage.setItem("auth", JSON.stringify(true));
-          appContext.setSigninSuccess(true);
-      })
-      .catch(err => console.log(err))
+    if (!(user.email && user.password)) {
+      console.log("here");
+      appContext.setFieldError(true);
+    } else {
+      axios
+        .post("http://localhost:5000/api/users/signin", user)
+        .then((res) => {
+          if (res.data.message === "success") {
+            router.push("/dashboard");
+            localStorage.setItem("user", JSON.stringify(res.data.user));
+            localStorage.setItem("auth", JSON.stringify(true));
+            appContext.setIsAuth(true);
+            appContext.setSigninSuccess(true);
+          } else if (res.data.message === "emailerror") {
+            appContext.setIsEmailError(true);
+          } else if (res.data.message === "emailNotExist") {
+            appContext.setExistEmailError(true);
+          } else {
+            appContext.setPasswordError(true);
+          }
+        })
+        .catch((err) => console.log(err));
+    }
   };
 
   return (
@@ -77,18 +100,23 @@ export default function SignIn() {
         <Box
           sx={{
             marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <TextField
               margin="normal"
               required
@@ -117,21 +145,81 @@ export default function SignIn() {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, backgroundColor: '#1976d2 !important' }}
+              sx={{ mt: 3, mb: 2, backgroundColor: "#1976d2 !important" }}
             >
               Sign In
             </Button>
-            <Snackbar open={appContext.signupSuccess} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{vertical: "top", horizontal: "right"}}>
-              <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>:
-                Your Sign Up is Successful!!!
+            <Snackbar
+              open={appContext.signupSuccess}
+              autoHideDuration={6000}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="success"
+                sx={{ width: "100%" }}
+              >
+                : Your Sign Up is Successful!!!
+              </Alert>
+            </Snackbar>
+            <Snackbar
+              open={appContext.fieldError}
+              autoHideDuration={6000}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: "100%" }}
+              >
+                : "You should fill all fields!!!"
+              </Alert>
+            </Snackbar>
+            <Snackbar
+              open={appContext.isEmailError}
+              autoHideDuration={6000}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: "100%" }}
+              >
+                : "Your Email Form is incorrect!!!"
+              </Alert>
+            </Snackbar>
+            <Snackbar
+              open={appContext.existEmailError}
+              autoHideDuration={6000}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: "100%" }}
+              >
+                : "Email does not exist!!!"
+              </Alert>
+            </Snackbar>
+            <Snackbar
+              open={appContext.passwordError}
+              autoHideDuration={6000}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: "100%" }}
+              >
+                : "Password is incorrect!!!"
               </Alert>
             </Snackbar>
             <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
               <Grid item>
                 <Link href="signup" variant="body2">
                   {"Don't have an account? Sign Up"}
