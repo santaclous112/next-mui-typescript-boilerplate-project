@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -17,13 +18,17 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { useAppContext } from '../context/AddContext';
+import { AlertProps } from '@mui/material';
+import MuiAlert from '@mui/material/Alert'; 
+import Snackbar from '@mui/material/Snackbar';
+
 
 function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="#">
+        Santa Website
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -31,12 +36,34 @@ function Copyright(props: any) {
   );
 }
 
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref,
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+  const [isValidEmail, setIsValidEmail] = useState<boolean>(false);
   const appContext = useAppContext();
   const router = useRouter();
+  const handleClose = () => {
+    appContext.setPasswordError(false);
+    appContext.setFieldError(false);
+    appContext.setIsEmailError(false);
+    appContext.setExistEmailError(false);
+
+  };
+
+  // const validateEmail = (email:FormDataEntryValue | string) => {
+  //   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  //   return emailRegex.test(email); 
+  // };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -44,16 +71,33 @@ export default function SignUp() {
       firstName: data.get("firstName"),
       lastName: data.get("lastName"),
       email: data.get('email'),
-      password: data.get('password')
+      password: data.get('password'),
+      confirmPassword: data.get('confirmPassword')
     };
-    // setNewUser(_newUser);
-    // console.log(newUser)
-    axios.post("http://localhost:5000/api/users/signup", newUser)
+
+    // setIsValidEmail(newUser.email ? validateEmail(newUser.email) : false);
+    
+    if(!(newUser.firstName && newUser.lastName && newUser.email && newUser.password && newUser.confirmPassword)) {
+      console.log("here")
+      appContext.setFieldError(true);
+    } else if(newUser.password !== newUser.confirmPassword) {
+      appContext.setPasswordError(true);
+    } else {
+      axios.post("http://localhost:5000/api/users/signup", newUser)
       .then(res => {
+        if(res.data.message === "success") {
           router.push("/signin");
           appContext.setSignupSuccess(true);
+        } else if(res.data.message === "emailerror") {
+          appContext.setIsEmailError(true);
+        } else {
+          appContext.setExistEmailError(true);
+        }
+          
       })
       .catch(err => console.log(err))
+    }
+    
   };
 
   return (
@@ -104,6 +148,7 @@ export default function SignUp() {
                   id="email"
                   label="Email Address"
                   name="email"
+                  type = "email"
                   autoComplete="email"
                 />
               </Grid>
@@ -129,12 +174,6 @@ export default function SignUp() {
                   autoComplete="new-password"
                 />
               </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid>
             </Grid>
             <Button
               type="submit"
@@ -144,6 +183,26 @@ export default function SignUp() {
             >
               Sign Up
             </Button>
+            <Snackbar open={appContext.passwordError} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{vertical: "top", horizontal: "right"}}>
+              <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>:
+                "Password and Confirm Password is different!!!""
+              </Alert>
+            </Snackbar>
+            <Snackbar open={appContext.isEmailError} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{vertical: "top", horizontal: "right"}}>
+              <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>:
+                "Your Email Form is incorrect!!!"
+              </Alert>
+            </Snackbar>
+            <Snackbar open={appContext.fieldError} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{vertical: "top", horizontal: "right"}}>
+              <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>:
+                "You should fill all fields!!!"
+              </Alert>
+            </Snackbar>
+            <Snackbar open={appContext.existEmailError} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{vertical: "top", horizontal: "right"}}>
+              <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>:
+                "Email already exists"
+              </Alert>
+            </Snackbar>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link href="/signin" variant="body2">
